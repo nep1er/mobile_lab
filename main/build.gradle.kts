@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "ci.nsu.moble.apilab"
+    namespace = "ci.nsu.moble.main"
     compileSdk = 34
 
     defaultConfig {
