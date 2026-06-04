@@ -91,9 +91,22 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     private fun loadGroups() {
         viewModelScope.launch {
+            android.util.Log.d("VM_DEBUG", "📡 Загрузка групп из репозитория...")
+
             repository.getGroups()
-                .onSuccess { groups -> _state.update { it.copy(groups = groups) } }
-                .onFailure { error -> _state.update { it.copy(error = "Не удалось загрузить группы: ${error.message}") } }
+                .onSuccess { groups ->
+                    android.util.Log.d("VM_DEBUG", "📦 Обновляю state: ${groups.size} групп")
+                    _state.update {
+                        android.util.Log.d("VM_DEBUG", "✅ State обновлён")
+                        it.copy(groups = groups)
+                    }
+                }
+                .onFailure { error ->
+                    android.util.Log.e("VM_DEBUG", "❌ Ошибка: ${error.message}", error)
+                    _state.update {
+                        it.copy(error = "Не удалось загрузить группы: ${error.message}")
+                    }
+                }
         }
     }
 

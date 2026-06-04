@@ -3,7 +3,6 @@
 package ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +20,17 @@ fun LoginScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    // 🔹 Навигация при успешном входе (по сообщению об успехе)
+    LaunchedEffect(state.successMessage) {
+        state.successMessage?.let {
+            navController.navigate("main") {
+                popUpTo("login") { inclusive = true }
+                launchSingleTop = true
+            }
+            viewModel.clearSuccess() // Очищаем сообщение
+        }
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -29,7 +39,6 @@ fun LoginScreen(
         Text("Вход в систему", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Логин
         OutlinedTextField(
             value = state.login,
             onValueChange = { viewModel.setLogin(it) },
@@ -39,7 +48,6 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Пароль
         OutlinedTextField(
             value = state.password,
             onValueChange = { viewModel.setPassword(it) },
@@ -50,19 +58,12 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Ошибка
         state.error?.let {
             Text(it, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(bottom = 8.dp))
         }
 
-        // Кнопка Войти
         Button(
-            onClick = {
-                viewModel.login()
-                if (viewModel.state.value.currentUser != null) {
-                    navController.navigate("main")
-                }
-            },
+            onClick = { viewModel.login() },
             modifier = Modifier.fillMaxWidth(),
             enabled = !state.isLoading
         ) {
@@ -75,7 +76,6 @@ fun LoginScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Ссылка на регистрацию
         TextButton(onClick = { navController.navigate("register") }) {
             Text("Нет аккаунта? Зарегистрироваться")
         }

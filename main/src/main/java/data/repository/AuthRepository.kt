@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.serialization.InternalSerializationApi::class)
+
 package data.repository
 
 import data.model.*
@@ -5,18 +7,19 @@ import network.RetrofitClient
 import utils.TokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.InternalSerializationApi
 import retrofit2.HttpException
 import java.io.IOException
 
 class AuthRepository {
 
-    @OptIn(InternalSerializationApi::class)
     suspend fun login(login: String, password: String): Result<UserDto> = withContext(Dispatchers.IO) {
         try {
             val response = RetrofitClient.api.login(LoginRequest(login, password))
             TokenManager.token = response.token
-            Result.success(response.user)
+
+            // Сервер не возвращает UserDto, создаём заглушку с логином
+            val dummyUser = UserDto(0, login, null, null)
+            Result.success(dummyUser)
         } catch (e: HttpException) {
             Result.failure(Exception("Ошибка авторизации: ${e.code()}"))
         } catch (e: IOException) {
@@ -26,7 +29,6 @@ class AuthRepository {
         }
     }
 
-    @OptIn(InternalSerializationApi::class)
     suspend fun register(request: RegisterRequest): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             RetrofitClient.api.register(request)
@@ -40,7 +42,6 @@ class AuthRepository {
         }
     }
 
-    @OptIn(InternalSerializationApi::class)
     suspend fun getUsers(): Result<List<UserDto>> = withContext(Dispatchers.IO) {
         try {
             val users = RetrofitClient.api.getUsers()
@@ -59,7 +60,6 @@ class AuthRepository {
         }
     }
 
-    @OptIn(InternalSerializationApi::class)
     suspend fun getGroups(): Result<List<GroupDto>> = withContext(Dispatchers.IO) {
         try {
             val groups = RetrofitClient.api.getGroups()

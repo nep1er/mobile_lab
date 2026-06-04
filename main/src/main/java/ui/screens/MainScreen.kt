@@ -2,17 +2,17 @@
 
 package ui.screens
 
-import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment  // ← ЭТОГО НЕ ХВАТАЛО
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import data.model.UserDto
+import data.model.UserDto  // ← Полный путь
 import ui.viewmodel.AuthViewModel
 
 @Composable
@@ -40,13 +40,13 @@ fun MainScreen(
             }
         }
 
-        Text("Добро пожаловать, ${state.currentUser?.login ?: "Пользователь"}!", modifier = Modifier.padding(bottom = 16.dp))
+        Text("Добро пожаловать, ${state.currentUser?.login ?: "Пользователь"}!", modifier = Modifier.padding(vertical = 16.dp))
 
         // Список пользователей
         if (state.users.isEmpty()) {
-            Text("Список пуст или не загружен...", modifier = Modifier.padding(top = 16.dp))
+            Text("Список пуст или загрузка...", modifier = Modifier.padding(top = 16.dp))
         } else {
-            LazyColumn {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(state.users) { user ->
                     UserItem(user)
                 }
@@ -58,15 +58,14 @@ fun MainScreen(
 @Composable
 fun UserItem(user: UserDto) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text(text = "👤 ${user.person?.firstName} ${user.person?.lastName}", fontWeight = FontWeight.Bold)
+            Text(text = "👤 ${user.login}", fontWeight = FontWeight.Bold)
             Text(text = "📧 ${user.email ?: "-"}", style = MaterialTheme.typography.bodySmall)
-            Text(text = " Логин: ${user.login}", style = MaterialTheme.typography.bodySmall)
-            if (user.person?.birthDate != null) {
-                Text(text = " Рождение: ${user.person.birthDate}", style = MaterialTheme.typography.bodySmall)
+            if (user.person?.firstName != null) {
+                Text(text = "${user.person.firstName} ${user.person.lastName}", style = MaterialTheme.typography.bodySmall)
             }
         }
     }
